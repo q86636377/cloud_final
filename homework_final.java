@@ -22,10 +22,10 @@ import org.apache.hadoop.mapreduce.Reducer;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 
-public class KnnPattern
+public class homework_final
 {
-    //°ÑdoubleÀàĞÍºÍstringÀàĞÍ¼¯ºÏÆğÀ´µÄÒ»¸öÀà£¬ÆäÖĞdouble±íÊ¾Îª´ı¼ì²âÑù±¾¾àÀë²âÊÔ¼¯
-    //ÖĞÑù±¾µÄ¾àÀë£¬string±íÊ¾²âÊÔ¼¯Ñù±¾ËùÊôÄ£ĞÍ£¬±¾´ÎÖĞ¼´¿ªµÄ³µµÄÀàĞÍ¡£
+    //æŠŠdoubleç±»å‹å’Œstringç±»å‹é›†åˆèµ·æ¥çš„ä¸€ä¸ªç±»ï¼Œå…¶ä¸­doubleè¡¨ç¤ºä¸ºå¾…æ£€æµ‹æ ·æœ¬è·ç¦»æµ‹è¯•é›†
+    //ä¸­æ ·æœ¬çš„è·ç¦»ï¼Œstringè¡¨ç¤ºæµ‹è¯•é›†æ ·æœ¬æ‰€å±æ¨¡å‹ï¼Œæœ¬æ¬¡ä¸­å³å¼€çš„è½¦çš„ç±»å‹ã€‚
 		public static class DoubleString implements WritableComparable<DoubleString>
 		{
 			private Double distance = 0.0;
@@ -37,10 +37,14 @@ public class KnnPattern
 				model = rhs;
 			}
 			public Double getDistance()
-				return distance;
+			{
+			    return distance;
+			}
 
 			public String getModel()
-				return model;
+            {
+                return model;
+            }
 
 			@Override
 			public void readFields(DataInput in) throws IOException
@@ -62,7 +66,7 @@ public class KnnPattern
 				return (this.model).compareTo(o.model);
 			}
 		}
-    //MapperÀà£¬ÓÃÓÚ¶ÔÊı¾İ½øĞĞÓ³Éä
+		//Mapperç±»ï¼Œç”¨äºå¯¹æ•°æ®è¿›è¡Œæ˜ å°„
 	public static class KnnMapper extends Mapper<Object, Text, NullWritable, DoubleString>
 	{
 		DoubleString distanceAndModel = new DoubleString();
@@ -75,22 +79,19 @@ public class KnnPattern
 		String sStatus;
 		String sGender;
 		double normalisedSChildren;
-
-		//ÊÖ¶¯È¡³öÊı¾İÖĞµÄ¸÷¸ö×î´ó×îĞ¡Öµ
+		//æ‰‹åŠ¨å–å‡ºæ•°æ®ä¸­çš„å„ä¸ªæœ€å¤§æœ€å°å€¼
 		double minAge = 18;
 		double maxAge = 77;
 		double minIncome = 5000;
 		double maxIncome = 67789;
 		double minChildren = 0;
 		double maxChildren = 5;
-
-		//¼ÆËã¹æ¸ñ»¯È¨ÖØ£¬È¡Öµ0-1
+		//è®¡ç®—è§„æ ¼åŒ–æƒé‡ï¼Œå–å€¼0-1
 		private double normalisedDouble(String n1, double minValue, double maxValue)
 		{
 			return (Double.parseDouble(n1) - minValue) / (maxValue - minValue);
 		}
-
-		//¼ÆËãÖ»ÓĞÁ½ÖÖÈ¡ÖµµÄ±äÁ¿µÄ¶Ô±ÈÈ¨ÖØ
+		//è®¡ç®—åªæœ‰ä¸¤ç§å–å€¼çš„å˜é‡çš„å¯¹æ¯”æƒé‡
 		private double nominalDistance(String t1, String t2)
 		{
 			if (t1.equals(t2))
@@ -102,14 +103,12 @@ public class KnnPattern
 				return 1;
 			}
 		}
-
-		//Îª¸ü¾«×¼£¬½«È¨ÖØÈ¡Ò»¸öÆ½·½
+		//è®¡ç®—åªæœ‰ä¸¤ç§å–å€¼çš„å˜é‡çš„å¯¹æ¯”æƒé‡
 		private double squaredDistance(double n1)
 		{
 			return Math.pow(n1,2);
 		}
-
-		//¼ÆËã×ÜµÄ¡°¾àÀë¡±
+		//è®¡ç®—æ€»çš„â€œè·ç¦»â€
 		private double totalSquaredDistance(double R1, double R2, String R3, String R4, double R5, double S1,
 				double S2, String S3, String S4, double S5)
 		{
@@ -121,8 +120,7 @@ public class KnnPattern
 
 			return squaredDistance(ageDifference) + squaredDistance(incomeDifference) + statusDifference + genderDifference + squaredDistance(childrenDifference);
 		}
-
-		//½øĞĞsetup
+		//è¿›è¡Œsetup
 		@Override
 		protected void setup(Context context) throws IOException, InterruptedException
 		{
@@ -139,8 +137,7 @@ public class KnnPattern
 				normalisedSChildren = normalisedDouble(st.nextToken(), minChildren, maxChildren);
 			}
 		}
-
-		//½øĞĞmap£¬¶ÔÊı¾İ½øĞĞÓ³Éä´¦Àí
+		//è¿›è¡Œmapï¼Œå¯¹æ•°æ®è¿›è¡Œæ˜ å°„å¤„ç†
 		@Override
 		public void map(Object key, Text value, Context context) throws IOException, InterruptedException
 		{
@@ -163,8 +160,7 @@ public class KnnPattern
 				KnnMap.remove(KnnMap.lastKey());
 			}
 		}
-
-		//ÖØÔØÒ»¸öÇå³ıº¯Êı
+		//é‡è½½ä¸€ä¸ªæ¸…é™¤å‡½æ•°
 		@Override
 		protected void cleanup(Context context) throws IOException, InterruptedException
 		{
@@ -177,14 +173,12 @@ public class KnnPattern
 			}
 		}
 	}
-
-	//reduerÀà
+	//reduerç±»
 	public static class KnnReducer extends Reducer<NullWritable, DoubleString, NullWritable, Text>
 	{
 		TreeMap<Double, String> KnnMap = new TreeMap<Double, String>();
 		int K;
-
-		//½øĞĞsetupµÄº¯Êı
+		//è¿›è¡Œsetupçš„å‡½æ•°
 		@Override
 		protected void setup(Context context) throws IOException, InterruptedException
 		{
@@ -195,8 +189,7 @@ public class KnnPattern
 				K = Integer.parseInt(st.nextToken());
 			}
 		}
-
-		//reduceº¯Êı£¬¶Ô½øĞĞmapºóµÄÊı¾İ½øĞĞ¹æÔ¼£¬µÃ³ö×îºóµÄÀà±ğÅĞ¶Ï
+		//reduceå‡½æ•°ï¼Œå¯¹è¿›è¡Œmapåçš„æ•°æ®è¿›è¡Œè§„çº¦ï¼Œå¾—å‡ºæœ€åçš„ç±»åˆ«åˆ¤æ–­
 		@Override
 		public void reduce(NullWritable key, Iterable<DoubleString> values, Context context) throws IOException, InterruptedException
 		{
@@ -239,8 +232,7 @@ public class KnnPattern
 			context.write(NullWritable.get(), new Text(mostCommonModel));
 		}
 	}
-
-	//mainº¯Êı£¬ÓÃÓÚ½ÓÊÜ²ÎÊı½øĞĞµ÷ÓÃ
+	//mainå‡½æ•°ï¼Œç”¨äºæ¥å—å‚æ•°è¿›è¡Œè°ƒç”¨
 	public static void main(String[] args) throws Exception
 	{
 		Configuration conf = new Configuration();
@@ -252,7 +244,7 @@ public class KnnPattern
 		}
 
 		Job job = Job.getInstance(conf, "Find K-Nearest Neighbour");
-		job.setJarByClass(KnnPattern.class);
+		job.setJarByClass(homework_final.class);
 		job.addCacheFile(new URI(args[2] + "#knnParamFile"));
 
 		job.setMapperClass(KnnMapper.class);
